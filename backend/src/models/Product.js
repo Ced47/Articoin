@@ -34,7 +34,7 @@ const ProductSchema = new mongoose.Schema({
     producter: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Producter',
-        required: true,
+        required: false,
     },
     createdAt: {
         type: Date,
