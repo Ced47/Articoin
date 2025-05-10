@@ -64,7 +64,7 @@ exports.login = async (req, res) => {
                 sameSite: 'None',
                 maxAge: 24 * 60 * 60 * 1000,
             });
-            res.status(200).json({ status: "success" })
+            res.status(200).json({ status: "success", access_token: token, user: user })
         });
 
     }

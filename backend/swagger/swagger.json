@@ -1,60 +1,63 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "API Documentation",
-        "version": "1.0.0"
+        "title": "API de gestion utilisateurs",
+        "version": "1.0.0",
+        "description": "API pour la gestion des utilisateurs et l'authentification"
     },
     "servers": [
         {
-            "url": "http://localhost:8000/api",
-            "description": "Local server"
+            "url": "https://articoin.onrender.com/api",
+            "description": "Serveur de développement"
         }
     ],
     "tags": [
         {
-            "name": "Auth",
-            "description": "Authentication endpoints"
+            "name": "Authentification",
+            "description": "Endpoints pour l'authentification"
         },
         {
-            "name": "Users",
-            "description": "User management (superstaff only)"
-        },
-        {
-            "name": "Products",
-            "description": "Product management"
+            "name": "Utilisateurs",
+            "description": "Gestion des utilisateurs"
         }
     ],
     "paths": {
         "/auth/register": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Authentification"
                 ],
+                "summary": "Création d'un nouvel utilisateur",
                 "security": [
                     {
                         "cookieAuth": []
                     }
                 ],
-                "summary": "Register new user (superstaff only)",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RegisterRequest"
+                                "$ref": "#/components/schemas/UserRegister"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "User created successfully"
+                        "description": "Utilisateur créé avec succès"
                     },
                     "400": {
-                        "description": "User already exists"
+                        "description": "L'utilisateur existe déjà"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
                     },
                     "500": {
-                        "description": "Server error"
+                        "description": "Erreur serveur"
                     }
                 }
             }
@@ -62,28 +65,36 @@
         "/auth/login": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "Authentification"
                 ],
-                "summary": "User login",
+                "summary": "Connexion d'un utilisateur",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginRequest"
+                                "$ref": "#/components/schemas/UserLogin"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful"
+                        "description": "Connexion réussie",
+                        "headers": {
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "token=abcde12345; Path=/; HttpOnly; Secure; SameSite=None"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Invalid credentials"
+                        "description": "Identifiants incorrects"
                     },
                     "500": {
-                        "description": "Server error"
+                        "description": "Erreur serveur"
                     }
                 }
             }
@@ -91,17 +102,12 @@
         "/auth/logout": {
             "get": {
                 "tags": [
-                    "Auth"
+                    "Authentification"
                 ],
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "summary": "User logout",
+                "summary": "Déconnexion de l'utilisateur",
                 "responses": {
                     "200": {
-                        "description": "Logout successful"
+                        "description": "Déconnexion réussie"
                     }
                 }
             }
@@ -109,17 +115,17 @@
         "/users": {
             "get": {
                 "tags": [
-                    "Users"
+                    "Utilisateurs"
                 ],
+                "summary": "Liste tous les utilisateurs",
                 "security": [
                     {
                         "cookieAuth": []
                     }
                 ],
-                "summary": "Get all users",
                 "responses": {
                     "200": {
-                        "description": "List of users",
+                        "description": "Liste des utilisateurs",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -130,6 +136,15 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
                     }
                 }
             }
@@ -137,14 +152,14 @@
         "/user/{id}": {
             "get": {
                 "tags": [
-                    "Users"
+                    "Utilisateurs"
                 ],
+                "summary": "Récupère un utilisateur par son ID",
                 "security": [
                     {
                         "cookieAuth": []
                     }
                 ],
-                "summary": "Get user by ID",
                 "parameters": [
                     {
                         "name": "id",
@@ -157,7 +172,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User details",
+                        "description": "Détails de l'utilisateur",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -165,19 +180,25 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
                     }
                 }
             },
             "put": {
                 "tags": [
-                    "Users"
+                    "Utilisateurs"
                 ],
+                "summary": "Met à jour un utilisateur",
                 "security": [
                     {
                         "cookieAuth": []
                     }
                 ],
-                "summary": "Update user",
                 "parameters": [
                     {
                         "name": "id",
@@ -192,27 +213,36 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateUserRequest"
+                                "$ref": "#/components/schemas/UserUpdate"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "User updated"
+                        "description": "Utilisateur mis à jour"
+                    },
+                    "400": {
+                        "description": "Données invalides"
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
                     }
                 }
             },
             "delete": {
                 "tags": [
-                    "Users"
+                    "Utilisateurs"
                 ],
+                "summary": "Supprime un utilisateur",
                 "security": [
                     {
                         "cookieAuth": []
                     }
                 ],
-                "summary": "Delete user",
                 "parameters": [
                     {
                         "name": "id",
@@ -225,66 +255,26 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "User deleted"
-                    }
-                }
-            }
-        },
-        "/products": {
-            "get": {
-                "tags": [
-                    "Products"
-                ],
-                "summary": "Get all products",
-                "responses": {
-                    "200": {
-                        "description": "List of products",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Product"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/product/{id}": {
-            "get": {
-                "tags": [
-                    "Products"
-                ],
-                "summary": "Get product by ID",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Product details",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Product"
-                                }
-                            }
-                        }
+                        "description": "Utilisateur supprimé"
+                    },
+                    "404": {
+                        "description": "Utilisateur non trouvé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
                     }
                 }
             }
         }
     },
     "components": {
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "token"
+            }
+        },
         "schemas": {
             "User": {
                 "type": "object",
@@ -315,7 +305,7 @@
                     }
                 }
             },
-            "RegisterRequest": {
+            "UserRegister": {
                 "type": "object",
                 "required": [
                     "name",
@@ -327,10 +317,13 @@
                         "type": "string"
                     },
                     "email": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "email"
                     },
                     "password": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 6
                     },
                     "role": {
                         "type": "string",
@@ -341,7 +334,7 @@
                     }
                 }
             },
-            "LoginRequest": {
+            "UserLogin": {
                 "type": "object",
                 "required": [
                     "email",
@@ -349,24 +342,29 @@
                 ],
                 "properties": {
                     "email": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "email"
                     },
                     "password": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "password"
                     }
                 }
             },
-            "UpdateUserRequest": {
+            "UserUpdate": {
                 "type": "object",
                 "properties": {
                     "name": {
                         "type": "string"
                     },
                     "email": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "email"
                     },
                     "password": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 6
                     },
                     "role": {
                         "type": "string",
@@ -376,63 +374,6 @@
                         ]
                     }
                 }
-            },
-            "Product": {
-                "type": "object",
-                "properties": {
-                    "_id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "category": {
-                        "$ref": "#/components/schemas/Category"
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "stock": {
-                        "type": "number"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "Category": {
-                "type": "object",
-                "properties": {
-                    "_id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            }
-        },
-        "securitySchemes": {
-            "cookieAuth": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "token"
             }
         }
     }
