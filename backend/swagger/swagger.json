@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "https://articoin.onrender.com/api",
+            "url": "http://localhost:8000/api",
             "description": "Serveur de développement"
         }
     ],
@@ -19,6 +19,10 @@
         {
             "name": "Utilisateurs",
             "description": "Gestion des utilisateurs"
+        },
+        {
+            "name": "Catégories",
+            "description": "Gestion des catégories"
         }
     ],
     "paths": {
@@ -85,7 +89,7 @@
                             "Set-Cookie": {
                                 "schema": {
                                     "type": "string",
-                                    "example": "token=abcde12345; Path=/; HttpOnly; Secure; SameSite=None"
+                                    "example": "token=abcde12345; SameSite=None"
                                 }
                             }
                         }
@@ -265,6 +269,172 @@
                     }
                 }
             }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Liste toutes les catégories",
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des catégories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                }
+            }
+        },
+        "/category": {
+            "post": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Crée une nouvelle catégorie",
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Catégorie créée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "La catégorie existe déjà"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                }
+            }
+        },
+        "/category/{id}": {
+            "put": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Met à jour une catégorie",
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Catégorie mise à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Catégorie non trouvée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Catégories"
+                ],
+                "summary": "Supprime une catégorie",
+                "security": [
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Catégorie supprimée"
+                    },
+                    "404": {
+                        "description": "Catégorie non trouvée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -363,8 +533,7 @@
                     },
                     "password": {
                         "type": "string",
-                        "format": "password",
-                        "minLength": 6
+                        "format": "password"
                     },
                     "role": {
                         "type": "string",
@@ -372,6 +541,44 @@
                             "staff",
                             "superstaff"
                         ]
+                    }
+                }
+            },
+            "Category": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "CategoryCreate": {
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CategoryUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
                     }
                 }
             }

@@ -53,18 +53,16 @@ exports.login = async (req, res) => {
         };
 
         // Sign the JWT
-        jwt.sign(payload, jwtSecret, { expiresIn: '24h' }, (err, token) => {
+        jwt.sign(payload, jwtSecret, { expiresIn: '30d' }, (err, token) => {
             // Remove the password from the user object
             user.password = undefined;
             if (err) throw err;
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: true,
                 path: '/',
-                sameSite: 'None',
                 maxAge: 24 * 60 * 60 * 1000,
             });
-            res.status(200).json({ status: "success", access_token: token, user: user })
+            res.status(200).json({ status: true, access_token: token, user: user })
         });
 
     }
