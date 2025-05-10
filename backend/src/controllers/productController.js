@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
-const cloudinary = require('../middlewares/cloudinaryUpload');
+const {cloudinary} = require('../middlewares/cloudinaryUpload');
 
 
 // Get all products
@@ -12,6 +12,46 @@ exports.getProducts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Get products by category
+exports.getProductsByCategory = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+
+        const categoryExist = await Category.exists({ _id: categoryId });
+        if (!categoryExist) {
+            return res.status(404).json({ message: "Cette catégorie n'existe pas" });
+        }
+
+        const products = await Product.find({ category: categoryId }).populate('category');
+        if (!products) {
+            return res.status(404).json({ message: "Aucun produit trouvé dans cette catégorie" });
+        }
+
+        res.status(200).json({ status: "success", data: { products } });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get all products by each categories
+exports.getProductsByCategories = async (req, res) => {
+    try {
+        const categories = await Category.find();
+        if (!categories) {
+            return res.status(404).json({ message: "Aucune catégorie trouvée" });
+        }
+
+        const productsByCategories = await Promise.all(categories.map(async (category) => {
+            const products = await Product.find({ category: category._id }).populate('category');
+            return { category, products };
+        }));
+
+        res.status(200).json({ status: "success", data: { productsByCategories } });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 // Get single product
 exports.getProduct = async (req, res) => {
@@ -35,9 +75,16 @@ exports.createProduct = async (req, res) => {
             return res.status(400).json({ message: "Cette catégorie n'existe pas" });
         }
 
+        const imagesUrls = [];
+        if (req.files) {
+            for (const file of req.files) {
+                imagesUrls.push(file.path);
+            }
+        }
+
         const product = new Product({
             ...req.body,
-            images: req.imagesUrls ? req.imagesUrls : [],
+            images: imagesUrls,
         });
 
         await product.save();
@@ -61,14 +108,19 @@ exports.updateProduct = async (req, res) => {
             }
         }
 
-        const productExist = await Product.exists({ _id: productId });
+        const productExist = await Product.findById({ _id: productId });
         if (!productExist) {
             return res.status(404).json({ message: "Produit non trouvé" });
         }
 
-        if (req.imagesUrls) {
-            updates.images = [...productExist.images, ...req.imagesUrls];
+        const imagesUrls = [];
+        if (req.files) {
+            for (const file of req.files) {
+                imagesUrls.push(file.path);
+            }
         }
+
+        updates.images = [...productExist.images, ...imagesUrls];
 
         const product = await Product.findByIdAndUpdate(productId, updates, { new: true, runValidators: true }).populate('category');
 
@@ -83,7 +135,7 @@ exports.deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
 
-        const productExist = await Product.exists({ _id: productId });
+        const productExist = await Product.findById({ _id: productId });
         if (!productExist) {
             return res.status(404).json({ message: "Produit non trouvé" });
         }
@@ -108,7 +160,7 @@ exports.deleteProduct = async (req, res) => {
 exports.deleteProductImages = async (req, res) => {
     try {
         const productId = req.params.id;
-        const imagesToDelete = req.body.images;
+        const imagesToDelete = req.body.imagesUrls;
 
         const productExist = await Product.exists({ _id: productId });
         if (!productExist) {
