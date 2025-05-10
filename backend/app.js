@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-// const swaggerUi = require("swagger-ui-express");
-// const swagger = require("./swagger/swagger");
+const swaggerUi = require("swagger-ui-express");
+const swagger = require("./swagger/swagger");
 const authRoutes = require("./src/routes/authRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 const categoryRoutes = require("./src/routes/categoryRoutes");
 const productRoutes = require("./src/routes/productRoutes");
+const producterRoutes = require("./src/routes/producterRoutes");
 require("dotenv").config();
 
 const corsOrigin = process.env.CORS_ORIGIN_TEST;
@@ -33,13 +34,14 @@ app.get("/", (req, res) => {
 });
 
 // Configuration Swagger
-// app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swagger));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swagger));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', productRoutes);
+app.use('/api', producterRoutes);
 
 
 app.use((err, req, res, next) => {
