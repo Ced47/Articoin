@@ -3,11 +3,10 @@ const userController = require('../controllers/userController');
 const { authenticate, authorize } = require('../middlewares/auth');
 
 const router = express.Router();
-router.use(authenticate, authorize('superstaff'));
 
-router.get('/users', userController.getUsers);
-router.get('/user/:id', userController.getUser);
-router.put('/user/:id', userController.updateUser);
-router.delete('/user/:id', userController.deleteUser);
+router.get('/users', authenticate, authorize('staff', 'superstaff'), userController.getUsers);
+router.get('/user/:id', authenticate, authorize('staff', 'superstaff'), userController.getUser);
+router.put('/user/:id', authenticate, authorize('staff', 'superstaff'), userController.updateUser);
+router.delete('/user/:id', authenticate, authorize('staff', 'superstaff'), userController.deleteUser);
 
 module.exports = router;

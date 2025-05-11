@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
             res.cookie('token', token, {
                 httpOnly: true,
                 path: '/',
-                maxAge: 24 * 60 * 60 * 1000,
+                maxAge: 30 * 24 * 60 * 60 * 1000,
             });
             res.status(200).json({ status: true, access_token: token, user: user })
         });
