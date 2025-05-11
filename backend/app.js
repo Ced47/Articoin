@@ -15,14 +15,14 @@ const corsOrigin = process.env.CORS_ORIGIN_TEST;
 const app = express();
 
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: corsOrigin,
     credentials: true,
     exposedHeaders: ["Content-Disposition"],
 };
 
 app.use(cors(corsOptions));
 
-app.options("http://localhost:3000", cors(corsOptions));
+app.options(corsOptions, cors(corsOptions));
 
 // Middleware pour analyser le JSON
 app.use(express.json({ limit: "5mb" }));
