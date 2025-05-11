@@ -10,19 +10,17 @@ const productRoutes = require("./src/routes/productRoutes");
 const producterRoutes = require("./src/routes/producterRoutes");
 require("dotenv").config();
 
-const corsOrigin = process.env.CORS_ORIGIN_TEST;
-
 const app = express();
 
 const corsOptions = {
-    origin: corsOrigin,
+    origin: "http://localhost:3000",
     credentials: true,
     exposedHeaders: ["Content-Disposition"],
 };
 
 app.use(cors(corsOptions));
 
-app.options(corsOptions, cors(corsOptions));
+app.options("http://localhost:3000", cors(corsOptions));
 
 // Middleware pour analyser le JSON
 app.use(express.json({ limit: "5mb" }));
