@@ -22,7 +22,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.options("*", cors(corsOptions));
+app.options("http://localhost:3000", cors(corsOptions));
 
 // Middleware pour analyser le JSON
 app.use(express.json({ limit: "5mb" }));
