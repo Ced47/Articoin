@@ -13,14 +13,14 @@ require("dotenv").config();
 const app = express();
 
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
     exposedHeaders: ["Content-Disposition"],
 };
 
 app.use(cors(corsOptions));
 
-app.options("http://localhost:3000", cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Middleware pour analyser le JSON
 app.use(express.json({ limit: "5mb" }));
