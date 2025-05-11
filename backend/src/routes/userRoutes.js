@@ -4,9 +4,9 @@ const { authenticate, authorize } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.get('/users', authorize('staff', 'superstaff'), userController.getUsers);
-router.get('/user/:id', authorize('staff', 'superstaff'), userController.getUser);
-router.put('/user/:id', authorize('staff', 'superstaff'), userController.updateUser);
-router.delete('/user/:id', authorize('staff', 'superstaff'), userController.deleteUser);
+router.get('/users', userController.getUsers);
+router.get('/user/:id', userController.getUser);
+router.put('/user/:id', userController.updateUser);
+router.delete('/user/:id', userController.deleteUser);
 
 module.exports = router;

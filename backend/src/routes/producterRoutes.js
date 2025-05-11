@@ -4,11 +4,11 @@ const { authenticate, authorize } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.get('/producters', authorize('staff', 'superstaff') , producterController.getProducters);
-router.get('/producter/:id', authorize('staff', 'superstaff'), producterController.getProducter);
-router.get('/producter/product/:id', authorize('staff', 'superstaff'), producterController.getProductsByProducter);
-router.post('/producter', authorize('staff', 'superstaff'), producterController.createProducter);
-router.put('/producter/:id', authorize('staff', 'superstaff'), producterController.updateProducter);
-router.delete('/producter/:id', authorize('staff', 'superstaff'), producterController.deleteProducter);
+router.get('/producters',  producterController.getProducters);
+router.get('/producter/:id', producterController.getProducter);
+router.get('/producter/product/:id', producterController.getProductsByProducter);
+router.post('/producter', producterController.createProducter);
+router.put('/producter/:id', producterController.updateProducter);
+router.delete('/producter/:id', producterController.deleteProducter);
 
 module.exports = router;
